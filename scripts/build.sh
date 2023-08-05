@@ -298,10 +298,12 @@ update_ksu_zip_name() {
     KERNELSU_APK_PATH=$DOWNLOAD_DIR/KernelSU.apk
     KERNELSU_INFO="$KERNELSU_PATH.info"
 }
+
 update_gapps_zip_name() {
     GAPPS_ZIP_NAME=MindTheGapps-$ARCH-13.0.zip
     GAPPS_PATH=$DOWNLOAD_DIR/$GAPPS_ZIP_NAME
 }
+
 echo "Generate Download Links"
 if [ "$RELEASE_TYPE" != "latest" ]; then
     python3 generateWSALinks.py "$ARCH" "$RELEASE_TYPE" "$DOWNLOAD_DIR" "$DOWNLOAD_CONF_NAME" || abort
