@@ -54,21 +54,27 @@ kernelVersion = sys.argv[4]
 file_name = sys.argv[5]
 abi_map = {"x64": "x86_64", "arm64": "arm64"}
 print(f"Generating KernelSU download link: arch={abi_map[arch]}, kernel version={kernelVersion}", flush=True)
-res = requests.get(f"https://api.github.com/repos/tiann/KernelSU/releases/latest")
+res = requests.get(f"https://api.github.com/repos/MustardChef/KernelSU/releases/latest")
 json_data = json.loads(res.content)
 headers = res.headers
 x_ratelimit_remaining = headers["x-ratelimit-remaining"]
 if res.status_code == 200:
     link = ""
+    apk = ""
     assets = json_data["assets"]
+    release_name = json_data["tag_name"]
     for asset in assets:
-        if re.match(f'kernel-WSA-{abi_map[arch]}-{kernelVersion}.*\.zip$', asset["name"]) and asset["content_type"] == "application/zip":
+        if re.match(f'kernel-WSA-{abi_map[arch]}-{kernelVersion}.*\.zip$', asset["name"]) and asset["content_type"] == "application/x-zip-compressed":
             link = asset["browser_download_url"]
+        if re.match(f'KernelSU_{release_name}_.*-release.*\.apk$', asset["name"]) and asset["content_type"] == "application/vnd.android.package-archive":
+            apk = asset["browser_download_url"]
             break
     if link == "":
         print(f"Error: No KernelSU release found for arch={abi_map[arch]}, kernel version={kernelVersion}", flush=True)
         exit(1)
-    release_name = json_data["name"]
+    elif apk == "":
+        print(f"Error: No KernelSU Manager release found", flush=True)
+        exit(1)
     with open(os.environ['WSA_WORK_ENV'], 'r') as environ_file:
         env = Prop(environ_file.read())
         env.KERNELSU_VER = release_name
@@ -88,3 +94,6 @@ with open(download_dir/tempScript, 'a') as f:
     f.writelines(f'{link}\n')
     f.writelines(f'  dir={download_dir}\n')
     f.writelines(f'  out={file_name}\n')
+    f.writelines(f'{apk}\n')
+    f.writelines(f'  dir={download_dir}\n')
+    f.writelines(f'  out=KernelSU.apk\n')
