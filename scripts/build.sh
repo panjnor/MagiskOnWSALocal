@@ -290,7 +290,8 @@ update_ksu_zip_name() {
     KERNEL_VER="5.15.94.4"
     if [ "$WSA_MAJOR_VER" = "2306" ]; then
         KERNEL_VER="5.15.104.1"
-    elif [ "$WSA_MAJOR_VER" -ge "2307" ]; then
+    fi    
+    if [ "$WSA_MAJOR_VER" -ge "2307" ]; then
         KERNEL_VER="5.15.104.2"
     fi
     KERNELSU_ZIP_NAME=kernelsu-$ARCH-$KERNEL_VER.zip
