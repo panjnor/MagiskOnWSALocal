@@ -304,10 +304,6 @@ update_gapps_zip_name() {
     GAPPS_PATH=$DOWNLOAD_DIR/$GAPPS_ZIP_NAME
 }
 
-echo "Generate Download Folder"
-touch "$DOWNLOAD_DIR"
-touch "$DOWNLOAD_DIR/download.list"
-
 echo "Generate Download Links"
 if [ "$RELEASE_TYPE" != "latest" ]; then
     python3 generateWSALinks.py "$ARCH" "$RELEASE_TYPE" "$DOWNLOAD_DIR" "$DOWNLOAD_CONF_NAME" || abort
