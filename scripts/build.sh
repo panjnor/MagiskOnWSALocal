@@ -821,3 +821,4 @@ echo -e "done\n"
 echo "Cleanup Work Directory"
 sudo rm -rf "${WORK_DIR:?}"
 echo "done"
+exit
