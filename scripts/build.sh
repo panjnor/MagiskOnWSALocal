@@ -311,6 +311,7 @@ if [ "$RELEASE_TYPE" != "latest" ]; then
     source "$WSA_WORK_ENV" || abort
 else
     printf "%s\n" "$(curl -sL https://api.github.com/repos/MustardChef/WSAPackages/releases/latest | jq -r '.assets[] | .browser_download_url')" >> "$DOWNLOAD_DIR/$DOWNLOAD_CONF_NAME" || abort
+    touch "$DOWNLOAD_DIR/$DOWNLOAD_CONF_NAME"
     printf "  dir=%s\n" "$DOWNLOAD_DIR" >> "$DOWNLOAD_DIR/$DOWNLOAD_CONF_NAME" || abort
     printf "  out=wsa-latest.zip\n" >> "$DOWNLOAD_DIR/$DOWNLOAD_CONF_NAME" || abort
     mkdir -p "$DOWNLOAD_DIR/xaml"
