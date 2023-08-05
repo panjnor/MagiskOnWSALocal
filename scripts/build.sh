@@ -304,6 +304,8 @@ update_gapps_zip_name() {
     GAPPS_PATH=$DOWNLOAD_DIR/$GAPPS_ZIP_NAME
 }
 
+echo "Generate Download Folder"
+touch "$DOWNLOAD_DIR"
 touch "$DOWNLOAD_DIR/download.list"
 
 echo "Generate Download Links"
