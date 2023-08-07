@@ -30,7 +30,6 @@
 cd ~/
 sudo git clone https://github.com/WSABuilds/MagiskOnWSALocal.git
 cd MagiskOnWSALocal
-sudo ./install_deps.sh
 sudo chmod a+x run.sh
 sudo ./run.sh
 ```
