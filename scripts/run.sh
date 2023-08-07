@@ -77,9 +77,9 @@ RELEASE_TYPE=$(
 )
 
 CUSTOM_MODEL=$(
-    Radiolist '([title]="Select Pixel Device Model"
+    Radiolist '([title]="Select Pixel Device Model" \
                 [default]="redfin")' \
-        'redfin' "Google Pixel 5" 'on' \        
+        'redfin' "Google Pixel 5" 'on' \
         'none' "Windows Subsystem For Android" 'off' \
         'sunfish' "Google Pixel 4a" 'off' \
         'bramble' "Google Pixel 4a 5G" 'off' \
