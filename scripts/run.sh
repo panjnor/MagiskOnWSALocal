@@ -144,7 +144,7 @@ if [ "$COMPRESS_OUTPUT" = "--compress" ]; then
 fi
 
 clear
-COMMAND_LINE=(--arch "$ARCH" --release-type "$RELEASE_TYPE" --root-sol "$ROOT_SOL" --gapps-brand "$GAPPS_BRAND" --compress-format "$COMPRESS_FORMAT")
+COMMAND_LINE=(--arch "$ARCH" --release-type "$RELEASE_TYPE" --root-sol "$ROOT_SOL" --gapps-brand "$GAPPS_BRAND" --custom-model "$CUSTOM_MODEL" --compress-format "$COMPRESS_FORMAT") 
 CHECK_NULL_LIST=("$REMOVE_AMAZON" "$COMPRESS_OUTPUT" "$OFFLINE" "$DEBUG" "$CUSTOM_MAGISK")
 for i in "${CHECK_NULL_LIST[@]}"; do
     if [ -n "$i" ]; then
@@ -152,15 +152,16 @@ for i in "${CHECK_NULL_LIST[@]}"; do
     fi
 done
 
-if [ -n "$CUSTOM_MODEL" ]; then
-    COMMAND_LINE+=(--custom-model "$CUSTOM_MODEL")
-fi
 if [ -n "$MAGISK_VER" ]; then
     COMMAND_LINE+=(--magisk-ver "$MAGISK_VER")
 fi
 
 if [ -n "$GAPPS_VARIANT" ]; then
     COMMAND_LINE+=(--gapps-variant "$GAPPS_VARIANT")
+fi
+
+if [ -n "$COMPRESS_FORMAT" ]; then
+    COMMAND_LINE+=(--compress-format "$COMPRESS_FORMAT")
 fi
 
 echo "COMMAND_LINE=${COMMAND_LINE[*]}"
