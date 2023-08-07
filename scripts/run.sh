@@ -144,7 +144,7 @@ if [ "$COMPRESS_OUTPUT" = "--compress" ]; then
 fi
 
 clear
-COMMAND_LINE=(--arch "$ARCH" --release-type "$RELEASE_TYPE" --root-sol "$ROOT_SOL" --gapps-brand "$GAPPS_BRAND" --custom-model "$CUSTOM_MODEL" --compress-format "$COMPRESS_FORMAT") 
+COMMAND_LINE=(--arch "$ARCH" --release-type "$RELEASE_TYPE" --root-sol "$ROOT_SOL" --gapps-brand "$GAPPS_BRAND" --custom-model "$CUSTOM_MODEL") 
 CHECK_NULL_LIST=("$REMOVE_AMAZON" "$COMPRESS_OUTPUT" "$OFFLINE" "$DEBUG" "$CUSTOM_MAGISK")
 for i in "${CHECK_NULL_LIST[@]}"; do
     if [ -n "$i" ]; then
