@@ -6,7 +6,7 @@
 
   The following dependencies are required:
 
-  | DistrOS             |                                                         |            |              |                    |               |              |              |
+  | Distros             |                                                         |            |              |                    |               |              |              |
   |:-------------------:|---------------------------------------------------------|------------|--------------|--------------------|---------------|--------------|--------------|
   | Debian              | `lzip patchelf e2fsprogs python3 aria2 attr unzip sudo` | `whiptail` | `qemu-utils` | `python3-venv`     | `python3-pip` | `p7zip-full` | `jq` |
   | openSUSE Tumbleweed | Same as above                                           | `dialog`   | `qemu-tools` | `python3-venvctrl` | Same as above |              | Same as above |
