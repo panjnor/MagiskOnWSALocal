@@ -82,8 +82,8 @@ CUSTOM_MODEL=$(
         'none' "Windows Subsystem For Android" 'off' \
         'sunfish' "Google Pixel 4a" 'off' \
         'bramble' "Google Pixel 4a 5G" 'off' \
-        'redfin' "Google Pixel 5" 'on' \
         'barbet' "Google Pixel 5a" 'off' \
+        'redfin' "Google Pixel 5" 'on' \
         'bluejay' "Google Pixel 6a" 'off' \
         'oriole' "Google Pixel 6" 'off' \
         'raven' "Google Pixel 6 Pro" 'off' \
