@@ -80,9 +80,9 @@ CUSTOM_MODEL=$(
     Radiolist '([title]="Select Pixel Device Model"
                 [default]="redfin")' \
         'redfin' "Google Pixel 5" 'on' \        
-        'none' 'off' \
+        'none' "Windows Subsystem For Android" 'off' \
         'sunfish' "Google Pixel 4a" 'off' \
-        'bramble' "Google Pixel 4a (5G)" 'off' \
+        'bramble' "Google Pixel 4a 5G" 'off' \
         'barbet' "Google Pixel 5a" 'off' \
         'redfin' "Google Pixel 5" 'off' \
         'bluejay' "Google Pixel 6a" 'off' \
