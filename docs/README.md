@@ -22,14 +22,6 @@
 
       Ready to use right out of the box.
 
-    - Debian (You can use [WSL2](https://apps.microsoft.com/store/detail/debian/9MSVKQC78PK6))
-
-      Ready to use right out of the box.
-
-    - openSUSE Tumbleweed (You can use [WSL2](https://apps.microsoft.com/store/detail/opensuse-tumbleweed/9MSSK2ZXXN11))
-
-      Ready to use right out of the box.
-
 <br/>
 
 ## Usage     
