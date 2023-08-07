@@ -53,7 +53,6 @@ sudo ./build.sh
     - ``beta`` - Beta Magisk Build
     - ``canary`` - Canary Magisk Build
     - ``debug`` - Debug Magisk Build
-    - ``release`` - Release Magisk Build
     - ``delta`` - [Magisk Delta Build](https://github.com/HuskyDG/magisk-files)
     - ``alpha`` - [Magisk Alpha Build](https://github.com/vvb2060/magisk_files)
 -  #### ***--gapps-brand***
