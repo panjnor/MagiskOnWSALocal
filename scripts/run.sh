@@ -129,19 +129,14 @@ else
     REMOVE_AMAZON="--remove-amazon"
 fi
 
-if (YesNoBox '([title]="Compress output" [text]="Do you want to compress the output?")'); then
-    COMPRESS_OUTPUT="--compress"
-else
-    COMPRESS_OUTPUT=""
-fi
-if [ "$COMPRESS_OUTPUT" = "--compress" ]; then
-    COMPRESS_FORMAT=$(
-        Radiolist '([title]="Compress format"
+
+COMPRESS_FORMAT=$(
+    Radiolist '([title]="Compress format"
                     [default]="7z")' \
             '7z' "7-Zip" 'on' \
             'zip' "Zip" 'off'
     )
-fi
+
 
 clear
 COMMAND_LINE=(--arch "$ARCH" --release-type "$RELEASE_TYPE" --root-sol "$ROOT_SOL" --gapps-brand "$GAPPS_BRAND" --custom-model "$CUSTOM_MODEL") 
@@ -152,8 +147,10 @@ for i in "${CHECK_NULL_LIST[@]}"; do
     fi
 done
 
-if [ -n "$MAGISK_VER" ]; then
+if [ "$MAGISK_VER" != "canary" ]; then
     COMMAND_LINE+=(--magisk-ver "$MAGISK_VER")
+else
+    COMMAND_LINE+=(--magisk-ver "canary")
 fi
 
 if [ -n "$GAPPS_VARIANT" ]; then
