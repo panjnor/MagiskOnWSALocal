@@ -203,6 +203,3 @@ if [ -f "$PYTHON_VENV_DIR/bin/activate" ]; then
 else
     python3 -m pip install -r requirements.txt -q || abort "Failed to install python3 dependencies"
 fi
-
-    python3 -m pip install -r requirements.txt -q || abort "Failed to install python3 dependencies"
-fi
