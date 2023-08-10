@@ -147,7 +147,7 @@ for i in "${CHECK_NULL_LIST[@]}"; do
     fi
 done
 
-if [ "$MAGISK_VER" != "none" ]; then
+if [ "$MAGISK_VER" != "" ]; then
     COMMAND_LINE+=(--magisk-ver "$MAGISK_VER")
 else
     COMMAND_LINE+=()
