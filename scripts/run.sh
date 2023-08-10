@@ -147,10 +147,10 @@ for i in "${CHECK_NULL_LIST[@]}"; do
     fi
 done
 
-if [ "$MAGISK_VER" != "canary" ]; then
+if [ "$MAGISK_VER" != "none" ]; then
     COMMAND_LINE+=(--magisk-ver "$MAGISK_VER")
 else
-    COMMAND_LINE+=(--magisk-ver "canary")
+    COMMAND_LINE+=()
 fi
 
 if [ -n "$GAPPS_VARIANT" ]; then
