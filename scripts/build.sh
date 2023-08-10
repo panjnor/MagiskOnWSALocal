@@ -424,10 +424,10 @@ if [[ "$SYSTEMIMAGES_FILE_SYSTEM_TYPE" = "erofs" ]]; then
     sudo mkdir -p -m 755 "$ROOT_MNT_RO" || abort
     sudo chown "0:0" "$ROOT_MNT_RO" || abort
     sudo setfattr -n security.selinux -v "u:object_r:rootfs:s0" "$ROOT_MNT_RO" || abort
-    sudo "../bin/EROFS/fuse.erofs" "$WORK_DIR/wsa/$ARCH/system.img" "$ROOT_MNT_RO" || abort 1
-    sudo "../bin/EROFS/fuse.erofs" "$WORK_DIR/wsa/$ARCH/vendor.img" "$VENDOR_MNT_RO" || abort 1
-    sudo "../bin/EROFS/fuse.erofs" "$WORK_DIR/wsa/$ARCH/product.img" "$PRODUCT_MNT_RO" || abort 1
-    sudo "../bin/EROFS/fuse.erofs" "$WORK_DIR/wsa/$ARCH/system_ext.img" "$SYSTEM_EXT_MNT_RO" || abort 1
+    sudo "../bin/EROFS/erofsfuse" "$WORK_DIR/wsa/$ARCH/system.img" "$ROOT_MNT_RO" || abort 1
+    sudo "../bin/EROFS/erofsfuse" "$WORK_DIR/wsa/$ARCH/vendor.img" "$VENDOR_MNT_RO" || abort 1
+    sudo "../bin/EROFS/erofsfuse" "$WORK_DIR/wsa/$ARCH/product.img" "$PRODUCT_MNT_RO" || abort 1
+    sudo "../bin/EROFS/erofsfuse" "$WORK_DIR/wsa/$ARCH/system_ext.img" "$SYSTEM_EXT_MNT_RO" || abort 1
     echo -e "done\n"
     echo "Create overlayfs for EROFS"
     mk_overlayfs system "$ROOT_MNT_RO" "$SYSTEM_MNT_RW" "$ROOT_MNT" || abort
