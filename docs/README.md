@@ -75,7 +75,6 @@ sudo ./run.sh
 -  #### ***--compress-format***
     - ``7z`` - Compress to a .7z archive
     - ``zip`` - Compress to a .zip archive
-    - ``xz`` - Compress to a .xz archive
 -  #### ***--remove-amazon***
     - Removes the Amazon Appstore 
         
