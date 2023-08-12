@@ -30,6 +30,7 @@
 cd ~/
 sudo git clone https://github.com/WSABuilds/MagiskOnWSALocal.git
 cd MagiskOnWSALocal
+cd scripts
 sudo ./run.sh
 ```
 
