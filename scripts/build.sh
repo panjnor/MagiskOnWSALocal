@@ -633,6 +633,15 @@ EOF
     echo -e "Add KernelSU Manager done\n"
 fi
 
+echo "Add extra packages"
+sudo cp -r "../$ARCH/system/"* "$SYSTEM_MNT" || abort
+find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -type d -exec chmod 0755 {} \;
+find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -type f -exec chmod 0644 {} \;
+find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -exec chown root:root {} \;
+find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -exec setfattr -n security.selinux -v "u:object_r:system_file:s0" {} \; || abort
+echo -e "Add extra packages done\n"
+
+
 echo "Permissions management Netfree and Netspark security certificates"
 sudo cp -r "../cacerts/"* "$SYSTEM_MNT/etc/security/cacerts/" || abort
 sudo chmod 0755 "$SYSTEM_MNT/etc/security/cacerts/"
