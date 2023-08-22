@@ -54,7 +54,7 @@ kernelVersion = sys.argv[4]
 file_name = sys.argv[5]
 abi_map = {"x64": "x86_64", "arm64": "arm64"}
 print(f"Generating KernelSU download link: arch={abi_map[arch]}, kernel version={kernelVersion}", flush=True)
-res = requests.get(f"https://api.github.com/repos/MustardChef/KernelSU/releases/latest")
+res = requests.get(f"https://api.github.com/repos/tiann/KernelSU/releases/latest")
 json_data = json.loads(res.content)
 headers = res.headers
 x_ratelimit_remaining = headers["x-ratelimit-remaining"]
@@ -64,7 +64,7 @@ if res.status_code == 200:
     assets = json_data["assets"]
     release_name = json_data["tag_name"]
     for asset in assets:
-        if re.match(f'kernel-WSA-{abi_map[arch]}-{kernelVersion}.*\.zip$', asset["name"]) and asset["content_type"] == "application/x-zip-compressed":
+        if re.match(f'kernel-WSA-{abi_map[arch]}-{kernelVersion}.*\.zip$', asset["name"]) and asset["content_type"] == "application/zip":
             link = asset["browser_download_url"]
         if re.match(f'KernelSU_{release_name}_.*-release.*\.apk$', asset["name"]) and asset["content_type"] == "application/vnd.android.package-archive":
             apk = asset["browser_download_url"]
