@@ -200,7 +200,6 @@ ROOT_SOL_MAP=(
 COMPRESS_FORMAT_MAP=(
     "7z"
     "zip"
-    "xz"
 )
 
 ARGUMENT_LIST=(
@@ -613,7 +612,7 @@ elif [ "$ROOT_SOL" = "kernelsu" ]; then
     KSU_PRE="$SYSTEM_MNT/bin/ksuinstall"
     sudo tee -a "$KSU_PRE" <<EOF >/dev/null || abort
 #!/system/bin/sh
-umask 0777
+umask 022
 echo "\nKernelSU Install Manager"
 if [ ! -e "/storage/emulated/0/.ksu_completed_$KERNELSU_VER" ]; then
     echo "\nInstalling KernelSU APK"
