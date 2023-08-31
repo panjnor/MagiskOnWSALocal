@@ -898,6 +898,7 @@ else
     name2=-MindTheGapps-13.0
 fi
 artifact_name=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${name1}${name2}
+short_artifact_name=WSA_${WSA_VER}_${ARCH}
 if [ "$REMOVE_AMAZON" = "yes" ]; then
     artifact_name+="-RemovedAmazon"
 fi
@@ -911,7 +912,7 @@ if [ ! -d "$OUTPUT_DIR" ]; then
 fi
 OUTPUT_PATH="${OUTPUT_DIR:?}/$artifact_name"
 if [ "$COMPRESS_OUTPUT" ] || [ -n "$COMPRESS_FORMAT" ]; then
-    mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$artifact_name"
+    mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
     if [ -z "$COMPRESS_FORMAT" ]; then
         COMPRESS_FORMAT="7z"
     fi
@@ -922,10 +923,10 @@ if [ "$COMPRESS_OUTPUT" ] || [ -n "$COMPRESS_FORMAT" ]; then
     rm -f "${OUTPUT_PATH:?}" || abort
     if [ "$COMPRESS_FORMAT" = "7z" ]; then
         echo "Compressing with 7z"
-        7z a "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$artifact_name" || abort
+        7z a "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$short_artifact_name" || abort
     elif [ "$COMPRESS_FORMAT" = "zip" ]; then
         echo "Compressing with zip"
-        7z -tzip a "$OUTPUT_PATH" "$WORK_DIR/wsa/$artifact_name" || abort
+        7z -tzip a "$OUTPUT_PATH" "$WORK_DIR/wsa/$short_artifact_name" || abort
     fi
 else
     rm -rf "${OUTPUT_PATH:?}" || abort
