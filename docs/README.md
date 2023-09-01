@@ -66,8 +66,10 @@ sudo ./run.sh
     - ``bluejay`` - Google Pixel 6a
     - ``oriole`` - Google Pixel 6
     - ``raven`` - Google Pixel 6 Pro
+    - ``lynx`` - Google Pixel 7a
     - ``panther`` - Google Pixel 7
     - ``cheetah`` - Google Pixel 7 Pro
+    - ``tangorpro`` - Google Pixel Tablet
 -  #### ***--root-sol***
     - ``magisk`` - Root using Magisk
     - ``kernelsu`` - Root using KernelSU
