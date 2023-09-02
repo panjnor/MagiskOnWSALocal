@@ -50,11 +50,11 @@ function DialogBox {
     shift
     $DIALOG --title "${o[title]}" --msgbox "${o[text]}" 0 0
 }
-intro="Welcome to MagiskOnWSA!
+intro="Welcome to MagiskOnWSALocal fork by @MustardChef!
 
     With this utility, you can integrate Magisk for WSA easily.
     Use arrow keys to navigate, and press space to select.
-    Press enter to confirm.
+    Press enter to confirm. 
 "
 DialogBox "([title]='Intro to MagiskOnWSA' \
             [text]='$intro')"
