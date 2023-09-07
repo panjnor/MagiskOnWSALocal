@@ -748,6 +748,16 @@ mkdir "$WORK_DIR/wsa/$ARCH/uwp"
 cp "$VCLibs_PATH" "$xaml_PATH" "$WORK_DIR/wsa/$ARCH/uwp/" || abort
 cp "$UWPVCLibs_PATH" "$xaml_PATH" "$WORK_DIR/wsa/$ARCH/uwp/" || abort
 cp "../xml/priconfig.xml" "$WORK_DIR/wsa/$ARCH/xml/" || abort
+if [[ "$ROOT_SOL" == "none" ]]; then 
+    rootInfo="No root solution"       
+    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $rootInfo" ../installer/Install.ps1 
+elif [[ "$ROOT_SOL" == "magisk" ]]; then
+    rootInfo="-with-magisk-$MAGISK_VERSION_NAME($MAGISK_VERSION_CODE)-$MAGISK_VER"
+    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $rootInfo" ../installer/Install.ps1 
+elif [[ "$ROOT_SOL" == "kernelsu" ]]; then  
+    rootInfo="-with-kernelsu-$KERNELSU_VER"
+    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $rootInfo" ../installer/Install.ps1 
+fi
 if [[ "$ROOT_SOL" = "none" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
     sudo sed -i -e 's@Start-Process\ "wsa://com.topjohnwu.magisk"@@g' ../installer/Install.ps1
     sudo sed -i -e 's@Start-Process\ "wsa://com.android.vending"@@g' ../installer/Install.ps1
