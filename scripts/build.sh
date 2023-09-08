@@ -388,7 +388,7 @@ if [ "$ROOT_SOL" = "kernelsu" ]; then
     fi
     if [ "$ARCH" = "x64" ]; then
         mv "$WORK_DIR/kernelsu/bzImage" "$WORK_DIR/kernelsu/kernel"
-    elif [ "$ARCH" = "arm64" ]; then
+    else
         mv "$WORK_DIR/kernelsu/Image" "$WORK_DIR/kernelsu/kernel"
     fi
     echo -e "done\n"
@@ -503,9 +503,9 @@ fi
 
 if [ "$REMOVE_AMAZON" ]; then
     echo "Remove Amazon Appstore"
-    rm -f "$WORK_DIR/wsa/$ARCH/apex/mado_release.apex"
+    rm -fv "$WORK_DIR/wsa/$ARCH/apex/mado_release.apex"
     # Stub
-    find "${PRODUCT_MNT:?}"/{apex,etc/*permissions} 2>/dev/null | grep -e mado | sudo xargs rm -rf
+    find "${PRODUCT_MNT:?}"/{apex,etc/*permissions} 2>/dev/null | grep -e mado | sudo xargs rm -rfv
     echo -e "done\n"
 fi
 
@@ -749,14 +749,41 @@ cp "$VCLibs_PATH" "$xaml_PATH" "$WORK_DIR/wsa/$ARCH/uwp/" || abort
 cp "$UWPVCLibs_PATH" "$xaml_PATH" "$WORK_DIR/wsa/$ARCH/uwp/" || abort
 cp "../xml/priconfig.xml" "$WORK_DIR/wsa/$ARCH/xml/" || abort
 if [[ "$ROOT_SOL" == "none" ]]; then 
-    rootInfo="No root solution"       
-    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $rootInfo" ../installer/Install.ps1 
-elif [[ "$ROOT_SOL" == "magisk" ]]; then
+    rootInfo=""
+    if [ "$GAPPS_BRAND" = "none" ]; then
+        gappsInfo="-NoGApps"
+    else
+        gappsInfo=-MindTheGapps-13.0
+    fi   
+    buildName=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${rootInfo}${gappsInfo}
+    if [ "$REMOVE_AMAZON" = "yes" ]; then
+        buildName+="-RemovedAmazon"
+    fi    
+    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $buildName" ../installer/Install.ps1 
+elif [ "$ROOT_SOL" == "magisk" ]; then
     rootInfo="-with-magisk-$MAGISK_VERSION_NAME($MAGISK_VERSION_CODE)-$MAGISK_VER"
-    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $rootInfo" ../installer/Install.ps1 
-elif [[ "$ROOT_SOL" == "kernelsu" ]]; then  
+    if [ "$GAPPS_BRAND" = "none" ]; then
+        gappsInfo="-NoGApps"
+    else
+        gappsInfo=-MindTheGapps-13.0
+    fi   
+    buildName=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${rootInfo}${gappsInfo}
+    if [ "$REMOVE_AMAZON" = "yes" ]; then
+        buildName+="-RemovedAmazon"
+    fi    
+    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $buildName" ../installer/Install.ps1 
+elif [ "$ROOT_SOL" == "kernelsu" ]; then  
     rootInfo="-with-kernelsu-$KERNELSU_VER"
-    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $rootInfo" ../installer/Install.ps1 
+    if [ "$GAPPS_BRAND" = "none" ]; then
+        gappsInfo="-NoGApps"
+    else
+        gappsInfo=-MindTheGapps-13.0
+    fi   
+    buildName=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${rootInfo}${gappsInfo}
+    if [ "$REMOVE_AMAZON" = "yes" ]; then
+        buildName+="-RemovedAmazon"
+    fi    
+    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $buildName" ../installer/Install.ps1 
 fi
 if [[ "$ROOT_SOL" = "none" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
     sudo sed -i -e 's@Start-Process\ "wsa://com.topjohnwu.magisk"@@g' ../installer/Install.ps1
@@ -911,35 +938,23 @@ short_artifact_name=WSA_${WSA_VER}_${ARCH}
 if [ "$REMOVE_AMAZON" = "yes" ]; then
     artifact_name+="-RemovedAmazon"
 fi
+
 echo "$artifact_name"
 echo -e "\nFinishing building...."
-if [ -f "$OUTPUT_DIR" ]; then
-    sudo rm -rf ${OUTPUT_DIR:?}
+if [ -d "$OUTPUT_DIR" ]; then
+    sudo rm -rf "$OUTPUT_DIR"
 fi
 if [ ! -d "$OUTPUT_DIR" ]; then
     mkdir -p "$OUTPUT_DIR"
 fi
-OUTPUT_PATH="${OUTPUT_DIR:?}/$artifact_name"
-if [ "$COMPRESS_OUTPUT" ] || [ -n "$COMPRESS_FORMAT" ]; then
-    mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
-    if [ -z "$COMPRESS_FORMAT" ]; then
-        COMPRESS_FORMAT="7z"
-    fi
-    if [ -n "$COMPRESS_FORMAT" ]; then
-        FILE_EXT=".$COMPRESS_FORMAT"
-        OUTPUT_PATH="$OUTPUT_PATH$FILE_EXT"
-    fi
-    rm -f "${OUTPUT_PATH:?}" || abort
-    if [ "$COMPRESS_FORMAT" = "7z" ]; then
-        echo "Compressing with 7z"
-        7z a "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$short_artifact_name" || abort
-    elif [ "$COMPRESS_FORMAT" = "zip" ]; then
-        echo "Compressing with zip"
-        7z -tzip a "$OUTPUT_PATH" "$WORK_DIR/wsa/$short_artifact_name" || abort
-    fi
+OUTPUT_PATH="${OUTPUT_DIR:?}/$artifact_name.$COMPRESS_FORMAT"
+mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
+if [ "$COMPRESS_FORMAT" = "7z" ]; then
+    echo "Compressing with 7-Zip"
+    7z a -mx=7 "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$short_artifact_name" || abort
 else
-    rm -rf "${OUTPUT_PATH:?}" || abort
-    cp -r "$WORK_DIR/wsa/$ARCH" "$OUTPUT_PATH" || abort
+    echo "Compressing with ZIP"
+    7z a -tzip -mx=7 "${OUTPUT_PATH}" "$WORK_DIR/wsa/$short_artifact_name" || abort
 fi
 echo -e "done\n"
 
