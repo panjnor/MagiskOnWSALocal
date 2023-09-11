@@ -88,7 +88,10 @@ CUSTOM_MODEL=$(
         'oriole' "Google Pixel 6" 'off' \
         'raven' "Google Pixel 6 Pro" 'off' \
         'panther' "Google Pixel 7" 'off' \
-        'cheetah' "Google Pixel 7 Pro" 'off'
+        'cheetah' "Google Pixel 7 Pro" 'off' \
+        'lynx' " Google Pixel 7a" 'off' \
+        'tangorpro' "Google Pixel Tablet" 'off'
+        
 )
 
 if (YesNoBox '([title]="Root" [text]="Do you want to Root WSA?")'); then
