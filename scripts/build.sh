@@ -947,17 +947,28 @@ fi
 if [ ! -d "$OUTPUT_DIR" ]; then
     mkdir -p "$OUTPUT_DIR"
 fi
-OUTPUT_PATH="${OUTPUT_DIR:?}/$artifact_name.$COMPRESS_FORMAT"
-mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
-if [ "$COMPRESS_FORMAT" = "7z" ]; then
-    echo "Compressing with 7-Zip"
-    7z a -mx=7 "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$short_artifact_name" || abort
+OUTPUT_PATH="${OUTPUT_DIR:?}/$artifact_name"
+if [ "$COMPRESS_OUTPUT" ] || [ -n "$COMPRESS_FORMAT" ]; then
+    mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
+    if [ -z "$COMPRESS_FORMAT" ]; then
+        COMPRESS_FORMAT="7z"
+    fi
+    if [ -n "$COMPRESS_FORMAT" ]; then
+        FILE_EXT=".$COMPRESS_FORMAT"
+        OUTPUT_PATH="$OUTPUT_PATH$FILE_EXT"
+    fi
+    rm -f "${OUTPUT_PATH:?}" || abort
+    if [ "$COMPRESS_FORMAT" = "7z" ]; then
+        echo "Compressing with 7z"
+        7z a -mx=7 "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$short_artifact_name" || abort
+    elif [ "$COMPRESS_FORMAT" = "zip" ]; then
+        echo "Compressing with zip"
+        7z -tzip a "$OUTPUT_PATH" "$WORK_DIR/wsa/$short_artifact_name" || abort
+    fi
 else
-    echo "Compressing with ZIP"
-    7z a -tzip -mx=7 "${OUTPUT_PATH}" "$WORK_DIR/wsa/$short_artifact_name" || abort
+    rm -rf "${OUTPUT_PATH:?}" || abort
+    cp -r "$WORK_DIR/wsa/$ARCH" "$OUTPUT_PATH" || abort
 fi
-echo -e "done\n"
-
 echo "Cleanup Work Directory"
 sudo rm -rf "${WORK_DIR:?}"
 echo "done"
