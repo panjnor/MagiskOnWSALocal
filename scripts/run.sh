@@ -89,7 +89,7 @@ CUSTOM_MODEL=$(
         'raven' "Google Pixel 6 Pro" 'off' \
         'panther' "Google Pixel 7" 'off' \
         'cheetah' "Google Pixel 7 Pro" 'off' \
-        'lynx' " Google Pixel 7a" 'off' \
+        'lynx' "Google Pixel 7a" 'off' \
         'tangorpro' "Google Pixel Tablet" 'off' \
         'felix' "Google Pixel Fold" 'off'
         
