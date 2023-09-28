@@ -191,7 +191,7 @@ CUSTOM_MODEL_MAP=(
 
 ROOT_SOL_MAP=(
     "magisk"
-    "su"
+    "kernelsu"
     "none"
 )
 
