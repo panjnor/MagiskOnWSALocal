@@ -49,10 +49,16 @@ Function Test-CommandExist {
 
 function Finish {
     Clear-Host
-    If (Test-CommandExist Optimize-VHD) {
-        Write-Output "Optimizing VHDX size...."
-        Optimize-VHD ".\*.vhdx" -Mode Full
+    Remove-Item -Force .\disk.txt
+    Write-Output "Optimizing VHDX size..."
+    foreach ($Partition in "system","product","system_ext","vendor") {
+        Write-Output "SELECT VDISK FILE=`"$PSScriptRoot\$Partition.vhdx`"`
+        ATTACH VDISK READONLY`
+        COMPACT VDISK`
+        DETACH VDISK" | Add-Content -Path "$Partition.txt" -Encoding UTF8
     }
+    Start-Process -NoNewWindow -Wait "diskpart.exe" -Args "/s disk.txt" -RedirectStandardOutput NUL
+    Remove-Item -Force .\disk.txt
     Clear-Host
     Start-Process "shell:AppsFolder\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp"
     Start-Process "wsa://com.topjohnwu.magisk"
@@ -62,8 +68,7 @@ function Finish {
 
 If (Test-CommandExist pwsh.exe) {
     $pwsh = "pwsh.exe"
-}
-Else {
+} Else {
     $pwsh = "powershell.exe"
 }
 
@@ -170,6 +175,28 @@ If (Test-CommandExist WsaClient) {
 }
 Stop-Process -Name "WsaClient" -ErrorAction SilentlyContinue
 Write-Output "`r`nInstalling MagiskOnWSA...."
+
+$winver = (Get-WmiObject -class Win32_OperatingSystem).Caption
+if ($winver.Contains("10")) {
+    Clear-Host
+    Write-Output "`r`nPatching Windows 10 AppxManifest file..."
+    $xml = [xml](Get-Content '.\AppxManifest.xml')
+    $nsm = New-Object Xml.XmlNamespaceManager($xml.NameTable)
+    $nsm.AddNamespace('rescap', "http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities")
+    $nsm.AddNamespace('desktop6', "http://schemas.microsoft.com/appx/manifest/desktop/windows10/6")
+    $node = $xml.Package.Capabilities.SelectSingleNode("rescap:Capability[@Name='customInstallActions']", $nsm)
+    $xml.Package.Capabilities.RemoveChild($node) | Out-Null
+    $node = $xml.Package.Extensions.SelectSingleNode("desktop6:Extension[@Category='windows.customInstall']", $nsm)
+    $xml.Package.Extensions.RemoveChild($node) | Out-Null
+    $xml.Package.Dependencies.TargetDeviceFamily.MinVersion = "10.0.19041.264"
+    $xml.Save(".\AppxManifest.xml")
+
+    Clear-Host
+    Write-Output "`r`nDownloading modifided DLL file..."
+    Invoke-WebRequest -Uri https://github.com/cinit/WSAPatch/blob/main/original.dll.win11.22h2/x86_64/winhttp.dll?raw=true -OutFile .\WSAClient\winhttp.dll
+    Invoke-WebRequest -Uri https://github.com/YT-Advanced/WSA-Script/blob/main/DLL/WsaPatch.dll?raw=true -OutFile .\WSAClient\WsaPatch.dll
+    Invoke-WebRequest -Uri https://github.com/YT-Advanced/WSA-Script/blob/main/DLL/icu.dll?raw=true -OutFile .\WSAClient\icu.dll
+}
 
 Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Register .\AppxManifest.xml
 If ($?) {
