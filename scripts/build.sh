@@ -21,6 +21,8 @@
 # shellcheck disable=SC2034
 cd "$(dirname "$0")" || exit 1
 WORK_DIR=$(mktemp -d -t wsa-build-XXXXXXXXXX_) || exit 1
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+chmod 777 "$PARENT_DIR"
 
 # lowerdir
 ROOT_MNT_RO="$WORK_DIR/erofs"
