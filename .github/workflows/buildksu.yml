@@ -1,0 +1,155 @@
+name: Magisk on WSA (with Google Apps)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ARCH:
+        description: 'Architecture'
+        type: choice
+        options:
+          - x64
+          - arm64
+        default: x64
+      RELEASE_TYPE:
+        description: 'WSA Release Type'
+        type: choice
+        options:
+          - Retail
+          - RP
+          - WIS
+          - WIF
+          - latest
+        default: Retail
+      GAPPS_BRAND:
+        description: 'GApps Brand'
+        type: choice
+        options:
+          - MindTheGapps
+          - none
+        default: MindTheGapps
+      CUSTOM_MODEL:
+        description: 'Custom Device Model Spoofing'
+        type: choice
+        options:
+          - none
+          - sunfish
+          - bramble
+          - redfin
+          - barbet
+          - bluejay
+          - oriole
+          - raven
+          - panther
+          - cheetah
+          - lynx
+          - tangorpro
+        default: none
+      ROOT_SOL:
+        description: 'Root Solution'
+        type: choice
+        options:
+          - kernelsu
+          - none
+        default: kernelsu
+      COMPRESS_FORMAT:
+        description: 'Output Archive Format'
+        type: choice
+        options:
+          - 7z
+          - zip
+          - none
+        default: 7z
+      REMOVE_AMAZON:
+        description: 'Remove Amazon Appstore?'
+        type: boolean
+
+jobs:
+  build-wsa:
+    name: Build WSA Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository ♻️
+        uses: actions/checkout@v5
+
+      - name: Install Dependencies 🧰
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lzip patchelf e2fsprogs python3 aria2 attr unzip sudo whiptail \
+            qemu-utils python3-venv python3-pip p7zip-full jq
+
+      - name: Setup Python Environment 🐍
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Python Requirements 🔧
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          echo "export PYTHONPATH='$PWD'" >> $GITHUB_ENV
+
+      - name: Verify Inputs 📋
+        run: |
+          echo "Build Configuration:"
+          echo "  ARCH:             ${{ inputs.ARCH }}"
+          echo "  RELEASE_TYPE:     ${{ inputs.RELEASE_TYPE }}"
+          echo "  MAGISK_VER:       ${{ inputs.MAGISK_VER }}"
+          echo "  GAPPS_BRAND:      ${{ inputs.GAPPS_BRAND }}"
+          echo "  CUSTOM_MODEL:     ${{ inputs.CUSTOM_MODEL }}"
+          echo "  ROOT_SOL:         ${{ inputs.ROOT_SOL }}"
+          echo "  COMPRESS_FORMAT:  ${{ inputs.COMPRESS_FORMAT }}"
+          echo "  REMOVE_AMAZON:    ${{ inputs.REMOVE_AMAZON }}"
+
+      - name: Run Build Script 🏗️
+        run: |
+          cd scripts
+          chmod +x run.sh
+          source ../.venv/bin/activate
+
+          # Construct the command based on inputs
+          ARGS="--arch ${{ inputs.ARCH }} --release-type ${{ inputs.RELEASE_TYPE }} --magisk-ver ${{ inputs.MAGISK_VER }}"
+
+          if [ "${{ inputs.GAPPS_BRAND }}" != "none" ]; then
+            ARGS="$ARGS --gapps-brand ${{ inputs.GAPPS_BRAND }}"
+          fi
+
+          if [ "${{ inputs.CUSTOM_MODEL }}" != "none" ]; then
+            ARGS="$ARGS --custom-model ${{ inputs.CUSTOM_MODEL }}"
+          fi
+
+          ARGS="$ARGS --root-sol ${{ inputs.ROOT_SOL }}"
+          ARGS="$ARGS --compress-format ${{ inputs.COMPRESS_FORMAT }}"
+
+          if [ "${{ inputs.REMOVE_AMAZON }}" = "true" ]; then
+            ARGS="$ARGS --remove-amazon"
+          fi
+
+          echo "Executing: ./run.sh $ARGS"
+          ./run.sh $ARGS
+
+      - name: Determine Output Artifact 🧾
+        id: output_artifact
+        run: |
+          # The script should create a zip or 7z file in the output folder
+          ARTIFACT_FILE=$(find output -maxdepth 1 -type f -name "*.zip" -o -name "*.7z" | head -n 1)
+          if [ -z "$ARTIFACT_FILE" ]; then
+            echo "No artifact file was found in the output directory."
+            exit 1
+          fi
+          echo "artifact_file=$ARTIFACT_FILE" >> $GITHUB_OUTPUT
+          echo "artifact_name=$(basename $ARTIFACT_FILE)" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact 📦
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.output_artifact.outputs.artifact_name }}
+          path: ${{ steps.output_artifact.outputs.artifact_file }}
+          retention-days: 7
+
+      - name: Final Cleanup
+        run: |
+          echo "Build completed. All artifacts have been uploaded to GitHub."
