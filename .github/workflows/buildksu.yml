@@ -1,155 +1,135 @@
-name: Magisk on WSA (with Google Apps)
+name: Build Magisk on WSA
 
 on:
   workflow_dispatch:
     inputs:
-      ARCH:
-        description: 'Architecture'
+      arch:
+        description: 'Target architecture'
+        required: true
         type: choice
+        default: 'x64'
         options:
           - x64
           - arm64
-        default: x64
-      RELEASE_TYPE:
-        description: 'WSA Release Type'
+      release_type:
+        description: 'WSA release channel'
+        required: true
         type: choice
+        default: 'Retail'
         options:
-          - Retail
-          - RP
-          - WIS
-          - WIF
           - latest
-        default: Retail
-      GAPPS_BRAND:
-        description: 'GApps Brand'
+          - WIF
+          - WIS
+          - RP
+          - Retail
+      root_sol:
+        description: 'Rooting solution'
+        required: true
         type: choice
-        options:
-          - MindTheGapps
-          - none
-        default: MindTheGapps
-      CUSTOM_MODEL:
-        description: 'Custom Device Model Spoofing'
-        type: choice
-        options:
-          - none
-          - sunfish
-          - bramble
-          - redfin
-          - barbet
-          - bluejay
-          - oriole
-          - raven
-          - panther
-          - cheetah
-          - lynx
-          - tangorpro
-        default: none
-      ROOT_SOL:
-        description: 'Root Solution'
-        type: choice
+        default: 'kernelsu'
         options:
           - kernelsu
           - none
-        default: kernelsu
-      COMPRESS_FORMAT:
-        description: 'Output Archive Format'
+      gapps_brand:
+        description: 'Google Apps package'
+        required: true
         type: choice
+        default: 'MindTheGapps'
+        options:
+          - MindTheGapps
+          - none
+      custom_model:
+        description: 'Device to emulate (for Play Store)'
+        required: true
+        type: choice
+        default: 'lynx'
+        options:
+          - none
+          - sunfish       # Google Pixel 4a
+          - bramble       # Google Pixel 4a (5G)
+          - barbet        # Google Pixel 5a
+          - redfin        # Google Pixel 5
+          - bluejay       # Google Pixel 6a
+          - oriole        # Google Pixel 6
+          - raven         # Google Pixel 6 Pro
+          - lynx          # Google Pixel 7a
+          - panther       # Google Pixel 7
+          - cheetah       # Google Pixel 7 Pro
+          - tangorpro     # Google Pixel Tablet
+      compress_format:
+        description: 'Compression format for the final archive'
+        required: true
+        type: choice
+        default: '7z'
         options:
           - 7z
           - zip
-          - none
-        default: 7z
-      REMOVE_AMAZON:
-        description: 'Remove Amazon Appstore?'
+      remove_amazon:
+        description: 'Remove the Amazon Appstore?'
+        required: true
         type: boolean
+        default: true
 
 jobs:
-  build-wsa:
-    name: Build WSA Package
+  build:
+    name: Build WSA with Magisk and GApps
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository ♻️
-        uses: actions/checkout@v5
-
-      - name: Install Dependencies 🧰
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y lzip patchelf e2fsprogs python3 aria2 attr unzip sudo whiptail \
-            qemu-utils python3-venv python3-pip p7zip-full jq
-
-      - name: Setup Python Environment 🐍
-        uses: actions/setup-python@v5
+      - name: Checkout Project Code ♻️
+        uses: actions/checkout@v4
         with:
-          python-version: '3.10'
-          cache: 'pip'
-
-      - name: Install Python Requirements 🔧
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          python3 -m pip install --upgrade pip
-          python3 -m pip install requests
-          echo "export PYTHONPATH='$PWD'" >> $GITHUB_ENV
+          repository: 'WSABuilds/MagiskOnWSALocal'
+          path: 'MagiskOnWSALocal'
 
       - name: Verify Inputs 📋
         run: |
           echo "Build Configuration:"
-          echo "  ARCH:             ${{ inputs.ARCH }}"
-          echo "  RELEASE_TYPE:     ${{ inputs.RELEASE_TYPE }}"
-          echo "  MAGISK_VER:       ${{ inputs.MAGISK_VER }}"
-          echo "  GAPPS_BRAND:      ${{ inputs.GAPPS_BRAND }}"
-          echo "  CUSTOM_MODEL:     ${{ inputs.CUSTOM_MODEL }}"
-          echo "  ROOT_SOL:         ${{ inputs.ROOT_SOL }}"
-          echo "  COMPRESS_FORMAT:  ${{ inputs.COMPRESS_FORMAT }}"
-          echo "  REMOVE_AMAZON:    ${{ inputs.REMOVE_AMAZON }}"
+          echo "  ARCH:             ${{ github.event.inputs.arch }}"
+          echo "  RELEASE_TYPE:     ${{ github.event.inputs.release_type }}"
+          echo "  ROOT_SOL:         ${{ github.event.inputs.root_sol }}"
+          echo "  MAGISK_VER:       ${{ github.event.inputs.magisk_ver }}"
+          echo "  GAPPS_BRAND:      ${{ github.event.inputs.gapps_brand }}"
+          echo "  CUSTOM_MODEL:     ${{ github.event.inputs.custom_model }}"
+          echo "  COMPRESS_FORMAT:  ${{ github.event.inputs.compress_format }}"
+          echo "  REMOVE_AMAZON:    ${{ github.event.inputs.remove_amazon }}"
 
-      - name: Run Build Script 🏗️
+      - name: Install System Dependencies 📦
         run: |
-          cd scripts
-          chmod +x run.sh
-          source ../.venv/bin/activate
+          sudo apt-get update
+          sudo apt-get install -y \
+            lzip patchelf e2fsprogs python3 aria2 attr unzip sudo \
+            qemu-utils python3-venv python3-pip p7zip-full jq
 
-          # Construct the command based on inputs
-          ARGS="--arch ${{ inputs.ARCH }} --release-type ${{ inputs.RELEASE_TYPE }} --magisk-ver ${{ inputs.MAGISK_VER }}"
-
-          if [ "${{ inputs.GAPPS_BRAND }}" != "none" ]; then
-            ARGS="$ARGS --gapps-brand ${{ inputs.GAPPS_BRAND }}"
-          fi
-
-          if [ "${{ inputs.CUSTOM_MODEL }}" != "none" ]; then
-            ARGS="$ARGS --custom-model ${{ inputs.CUSTOM_MODEL }}"
-          fi
-
-          ARGS="$ARGS --root-sol ${{ inputs.ROOT_SOL }}"
-          ARGS="$ARGS --compress-format ${{ inputs.COMPRESS_FORMAT }}"
-
-          if [ "${{ inputs.REMOVE_AMAZON }}" = "true" ]; then
-            ARGS="$ARGS --remove-amazon"
-          fi
-
-          echo "Executing: ./run.sh $ARGS"
-          ./run.sh $ARGS
-
-      - name: Determine Output Artifact 🧾
-        id: output_artifact
+      - name: Install Python Dependencies 🐍
+        working-directory: MagiskOnWSALocal/scripts
         run: |
-          # The script should create a zip or 7z file in the output folder
-          ARTIFACT_FILE=$(find output -maxdepth 1 -type f -name "*.zip" -o -name "*.7z" | head -n 1)
-          if [ -z "$ARTIFACT_FILE" ]; then
-            echo "No artifact file was found in the output directory."
-            exit 1
-          fi
-          echo "artifact_file=$ARTIFACT_FILE" >> $GITHUB_OUTPUT
-          echo "artifact_name=$(basename $ARTIFACT_FILE)" >> $GITHUB_OUTPUT
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Upload Artifact 📦
+      - name: Build WSA Package 🏗️
+        working-directory: MagiskOnWSALocal/scripts
+        run: |
+          # Conditionally add the --remove-amazon flag
+          AmazonFlag=""
+          if [[ "${{ github.event.inputs.remove_amazon }}" == "true" ]]; then
+            AmazonFlag="--remove-amazon"
+          fi
+
+          # Run the main build script with all the selected options
+          sudo ./run.sh \
+            --arch "${{ github.event.inputs.arch }}" \
+            --release-type "${{ github.event.inputs.release_type }}" \
+            --magisk-ver "${{ github.event.inputs.magisk_ver }}" \
+            --gapps-brand "${{ github.event.inputs.gapps_brand }}" \
+            --custom-model "${{ github.event.inputs.custom_model }}" \
+            --root-sol "${{ github.event.inputs.root_sol }}" \
+            --compress-format "${{ github.event.inputs.compress_format }}" \
+            $AmazonFlag
+
+      - name: Upload Build Artifact 📤
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.output_artifact.outputs.artifact_name }}
-          path: ${{ steps.output_artifact.outputs.artifact_file }}
-          retention-days: 7
-
-      - name: Final Cleanup
-        run: |
-          echo "Build completed. All artifacts have been uploaded to GitHub."
+          name: WSA-Build-${{ github.event.inputs.arch }}-${{ github.run_id }}
+          path: MagiskOnWSALocal/output/
+          if-no-files-found: error
