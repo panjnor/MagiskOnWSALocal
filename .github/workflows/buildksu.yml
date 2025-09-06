@@ -79,7 +79,7 @@ jobs:
       - name: Checkout Project Code ♻️
         uses: actions/checkout@v4
         with:
-          repository: 'WSABuilds/MagiskOnWSALocal'
+          repository: 'panjnor/MagiskOnWSALocal'
           path: 'MagiskOnWSALocal'
 
       - name: Verify Inputs 📋
